@@ -1,26 +1,97 @@
 @import "tailwindcss";
 
+@theme {
+  --color-background: oklch(0.98 0.01 90); /* Warm off-white / cream */
+  --color-foreground: oklch(0.2 0.01 250); /* Deep charcoal/slate */
+  
+  --color-surface: oklch(1 0 0); /* Pure white for cards */
+  --color-surface-hover: oklch(0.96 0.01 90);
+  
+  --color-primary: oklch(0.5 0.15 140); /* Emerald / Forest Green */
+  --color-primary-foreground: oklch(0.98 0.01 90);
+  
+  --color-accent: oklch(0.6 0.18 40); /* Terracotta / Rust */
+  --color-accent-foreground: oklch(0.98 0.01 90);
+  
+  --color-muted: oklch(0.94 0.01 90);
+  --color-muted-foreground: oklch(0.5 0.02 250);
+
+  --color-border: oklch(0.9 0.01 90);
+  
+  --color-expense: oklch(0.6 0.18 40); /* Terracotta */
+  --color-income: oklch(0.5 0.15 140); /* Emerald */
+  
+  --font-sans: "Inter", "Geist", system-ui, sans-serif;
+  --font-display: "Clash Display", "Space Grotesk", system-ui, sans-serif;
+  
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+@utility font-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+@utility grid-cols-auto-fit {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: oklch(0.98 0.01 90);
+  --foreground: oklch(0.2 0.01 250);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for an editorial feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-duration: 300ms;
+}
+
+/* Base card styling to avoid repetition */
+.editorial-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  box-shadow: 0 4px 20px oklch(0 0 0 / 0.03);
+}
+
+.heading-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
 }
