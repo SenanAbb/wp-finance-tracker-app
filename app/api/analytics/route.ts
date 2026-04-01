@@ -27,7 +27,14 @@ async function getAuthenticatedUserId(request: NextRequest): Promise<string | nu
     return null
   }
 
-  const response = await fetch(`${API_URL}/auth/me`, {
+  const url = (() => {
+    if (API_URL.startsWith('http://') || API_URL.startsWith('https://')) {
+      return `${API_URL}/auth/me`
+    }
+    return `${request.nextUrl.origin}${API_URL}/auth/me`
+  })()
+
+  const response = await fetch(url, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${accessToken}`,

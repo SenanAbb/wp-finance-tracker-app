@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 const API_URL = (() => {
@@ -28,7 +28,18 @@ export async function getUserId(): Promise<string> {
     redirect('/login?expired=1')
   }
 
-  const res = await fetch(`${API_URL}/auth/me`, {
+  const absoluteUrl = await (async () => {
+    if (API_URL.startsWith('http://') || API_URL.startsWith('https://')) {
+      return `${API_URL}/auth/me`
+    }
+
+    const h = await headers()
+    const host = h.get('x-forwarded-host') || h.get('host')
+    const proto = h.get('x-forwarded-proto') || 'https'
+    return `${proto}://${host}${API_URL}/auth/me`
+  })()
+
+  const res = await fetch(absoluteUrl, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
