@@ -41,15 +41,7 @@ export default function LoginPage() {
     try {
       const result = await verifyOTP(phone, otp);
       
-      if (result.ok && result.accessToken && result.refreshToken) {
-        // Guardar tokens en localStorage y cookies
-        localStorage.setItem('accessToken', result.accessToken);
-        localStorage.setItem('refreshToken', result.refreshToken);
-        
-        document.cookie = `accessToken=${result.accessToken}; path=/; max-age=3600; SameSite=Strict`;
-        document.cookie = `refreshToken=${result.refreshToken}; path=/; max-age=604800; SameSite=Strict`;
-        
-        // Redirigir al dashboard
+      if (result.ok) {
         await router.push('/');
       } else {
         setError(result.error || 'Failed to verify OTP');

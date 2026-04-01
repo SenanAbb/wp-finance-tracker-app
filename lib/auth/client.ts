@@ -16,15 +16,12 @@ interface RequestLoginResponse {
 interface VerifyOTPResponse {
   ok: boolean;
   error?: string;
-  accessToken?: string;
-  refreshToken?: string;
   expiresIn?: number;
 }
 
 interface RefreshTokenResponse {
   ok: boolean;
   error?: string;
-  accessToken?: string;
   expiresIn?: number;
 }
 
@@ -51,6 +48,7 @@ export async function requestLogin(phone: string): Promise<RequestLoginResponse>
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ phone }),
     });
 
@@ -75,6 +73,7 @@ export async function verifyOTP(phone: string, otp: string): Promise<VerifyOTPRe
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ phone, otp }),
     });
 
@@ -93,14 +92,15 @@ export async function verifyOTP(phone: string, otp: string): Promise<VerifyOTPRe
 /**
  * Refresca un Access Token usando un Refresh Token
  */
-export async function refreshAccessToken(refreshToken: string): Promise<RefreshTokenResponse> {
+export async function refreshAccessToken(): Promise<RefreshTokenResponse> {
   try {
     const response = await fetch(`${API_URL}/auth/refresh-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ refreshToken }),
+      credentials: 'include',
+      body: JSON.stringify({}),
     });
 
     if (!response.ok) {
@@ -117,14 +117,14 @@ export async function refreshAccessToken(refreshToken: string): Promise<RefreshT
 /**
  * Logout: revoca la sesión actual
  */
-export async function logout(accessToken: string): Promise<LogoutResponse> {
+export async function logout(): Promise<LogoutResponse> {
   try {
     const response = await fetch(`${API_URL}/auth/logout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -141,13 +141,11 @@ export async function logout(accessToken: string): Promise<LogoutResponse> {
 /**
  * Obtiene información del usuario actual
  */
-export async function getMe(accessToken: string): Promise<MeResponse> {
+export async function getMe(): Promise<MeResponse> {
   try {
     const response = await fetch(`${API_URL}/auth/me`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -161,60 +159,3 @@ export async function getMe(accessToken: string): Promise<MeResponse> {
   }
 }
 
-/**
- * Obtiene el Access Token almacenado (desde localStorage o cookies)
- */
-export function getStoredAccessToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  // Intentar obtener de localStorage primero (para compatibilidad)
-  return localStorage.getItem('accessToken');
-}
-
-/**
- * Obtiene el Refresh Token almacenado (desde localStorage o cookies)
- */
-export function getStoredRefreshToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  // Intentar obtener de localStorage primero (para compatibilidad)
-  return localStorage.getItem('refreshToken');
-}
-
-/**
- * Almacena los tokens en localStorage y cookies
- */
-export function setStoredTokens(accessToken: string, refreshToken: string): void {
-  if (typeof window === 'undefined') return;
-  
-  // Guardar en localStorage
-  localStorage.setItem('accessToken', accessToken);
-  localStorage.setItem('refreshToken', refreshToken);
-  
-  // Guardar en cookies para que el middleware pueda acceder
-  // Access token: expira en 1 hora
-  document.cookie = `accessToken=${accessToken}; path=/; max-age=3600; SameSite=Strict`;
-  // Refresh token: expira en 7 días
-  document.cookie = `refreshToken=${refreshToken}; path=/; max-age=604800; SameSite=Strict`;
-}
-
-/**
- * Limpia los tokens almacenados
- */
-export function clearStoredTokens(): void {
-  if (typeof window === 'undefined') return;
-  
-  // Limpiar localStorage
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
-  
-  // Limpiar cookies
-  document.cookie = 'accessToken=; path=/; max-age=0';
-  document.cookie = 'refreshToken=; path=/; max-age=0';
-}
-
-/**
- * Verifica si hay un token válido almacenado
- */
-export function hasValidToken(): boolean {
-  const token = getStoredAccessToken();
-  return !!token;
-}

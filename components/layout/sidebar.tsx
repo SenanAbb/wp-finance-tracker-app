@@ -3,7 +3,7 @@
 import { LayoutDashboard, ReceiptText, PieChart, Settings, Wallet, LogOut, Menu, X } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { logout, getStoredAccessToken, clearStoredTokens } from "@/lib/auth/client"
+import { logout } from "@/lib/auth/client"
 import { useState } from "react"
 
 const navigation = [
@@ -21,13 +21,8 @@ export function Sidebar() {
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
-    const accessToken = getStoredAccessToken()
-    
-    if (accessToken) {
-      await logout(accessToken)
-    }
-    
-    clearStoredTokens()
+
+    await logout()
     router.push('/login')
   }
 
