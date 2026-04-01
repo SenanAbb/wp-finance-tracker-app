@@ -4,7 +4,13 @@
 // Funciones para interactuar con los endpoints de autenticación
 // ============================================================================
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = (() => {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+  // In production (Vercel), we proxy API through Next rewrites at /api
+  // to keep cookies same-origin.
+  if (envUrl && /localhost|127\.0\.0\.1/.test(envUrl)) return envUrl;
+  return '/api';
+})();
 
 interface RequestLoginResponse {
   ok: boolean;

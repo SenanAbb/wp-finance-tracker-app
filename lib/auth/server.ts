@@ -1,7 +1,11 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+const API_URL = (() => {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL
+  if (envUrl && /localhost|127\.0\.0\.1/.test(envUrl)) return envUrl
+  return '/api'
+})()
 
 interface MeResponse {
   ok: boolean
